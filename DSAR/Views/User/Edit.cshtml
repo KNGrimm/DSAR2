@@ -1,0 +1,20 @@
+﻿@model DSAR.Models.User
+
+<h2>Edit User</h2>
+
+<form asp-controller="User" asp-action="update" method="post">
+    
+   
+
+    <div>
+        <label asp-for="FullName"></label>
+        <input asp-for="FullName" />
+    </div>
+
+    <div>
+        <label asp-for="Email"></label>
+        <input asp-for="Email" />
+    </div>
+
+    <button type="submit">Save</button>
+</form>
