@@ -40,13 +40,13 @@
                 {
                     <tr>
                        
-                        <td>@user.FullName</td>
+                        <td>@user.UserName</td>
                         
                         <td>@user.Email</td>
                     <td>
-                        <a asp-controller="User" asp-action="Edit" asp-route-id="@user.UserId">Edit</a> <!-- ✅ Edit link -->
+                        <a asp-controller="User" asp-action="Edit" asp-route-id="@user.Id">Edit</a> <!-- ✅ Edit link -->
                     </td>
-                    <td><a asp-controller="User" asp-action="Delete" asp-route-id="@user.UserId">Delete</a>
+                    <td><a asp-controller="User" asp-action="Delete" asp-route-id="@user.Id">Delete</a>
                         </td>
                     </tr>
                 }

@@ -5,6 +5,8 @@ namespace DSAR.Models
 {
     public class User : IdentityUser
     {
+        
+        public int UserId { get; set; }
         public string FullName { get; set; }
         
     }

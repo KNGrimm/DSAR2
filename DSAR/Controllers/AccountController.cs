@@ -68,6 +68,7 @@ namespace DSAR.Controllers
                     FullName = model.Name,
                     Email = model.Email,
                     UserName = model.Email,
+                    UserId = model.UserId,
                 };
 
                 var result = await userManager.CreateAsync(users, model.Password);

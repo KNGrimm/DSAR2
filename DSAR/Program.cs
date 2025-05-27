@@ -1,5 +1,6 @@
 using DSAR.Data;
 using DSAR.Models;
+using DSAR.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -35,6 +36,7 @@ builder.Services.AddIdentity<User, IdentityRole>(option =>
 })
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 var app = builder.Build();
 

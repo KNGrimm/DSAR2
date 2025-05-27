@@ -1,173 +1,121 @@
-using DSAR.Data;
-using DSAR.Models;
+using DSAR.Repositories;
 using DSAR.ViewModels;
-
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DSAR.Controllers
 {
     public class UserController : Controller
     {
-        private readonly AppDbContext _context;
-        public UserController(AppDbContext context)
+        private readonly IUserRepository _userRepository;
+
+        public UserController(IUserRepository userRepository)
         {
-            _context = context;
+            _userRepository = userRepository;
         }
-        
-        public ActionResult Login()
-        {
-            return View();
-        }
-        public async Task<ActionResult> Insert()
+
+        public IActionResult Login()
         {
             return View();
         }
 
-        public async Task<IActionResult> list()
+        public IActionResult Insert()
         {
-            var users = await _context.User.ToListAsync();
-
-           
-           // var currentUser = await _context.User.FirstOrDefaultAsync(u => u.UserId == userId);
-           
-          var usersViewModel =new List<UserView>();
-
-            foreach (var user in users)
-            {
-                usersViewModel.Add(new UserView
-                {
-                    //Users = users,
-                    // UserGUID = Guid.NewGuid().ToString(),
-                    // UserId = user.UserId,
-                    //FullName = user.FullName,
-                    //Email = user.Email
-                   
-                });
-
-            }
-            //var userView = new UserView
-            //{
-            //    //Users = users,
-            //   // UserGUID = Guid.NewGuid().ToString(),
-            //    UserId = currentUser.UserId,
-            //    FullName = currentUser.FullName,
-            //    Email = currentUser.Email
-            //};
-
-            return View(usersViewModel); // This passes both the list & current user
+            return View();
         }
 
-        public async Task<IActionResult> Edit(int id)
+        public IActionResult list()
         {
-          
-        
-            var user = await _context.User.FindAsync(id);
+            var users = _userRepository.GetAll();
 
-            if (user == null)
+            var usersViewModel = users.Select(user => new UserView
             {
-                return NotFound();
-            }
+                //Fill in fields as needed
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+            }).ToList();
+
+            return View(usersViewModel);
+        }
+
+        public IActionResult Edit(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var user = _userRepository.GetById(id);
+            if (user == null) return NotFound();
 
             return View(user);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(User user)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.User.Update(user); // ✅ Update user
-                await _context.SaveChangesAsync(); // ✅ Save changes
-                return RedirectToAction("list"); // Go back to list
-            }
+        //public IActionResult Edit(IdentityUser user)
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        _userRepository.Update(user);
+        //        _userRepository.Save();
+        //        return RedirectToAction("list");
+        //    }
 
-            return View(user); // In case of validation errors
+        //    return View(user);
+        //}
+
+        public IActionResult Details(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var user = _userRepository.GetById(id);
+            if (user == null) return NotFound();
+
+            return View(user);
         }
 
-
-        
-
-        // GET: FunController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: FunController/Create
-        // ===========================
-        // INSERT (Create Student)
-        // ===========================
-
-        // Show the form to create a new student
         public IActionResult Create()
         {
             return View();
         }
 
-        // Handle POST: Save new student to the database
         [HttpPost]
-        public async Task<IActionResult> Create(User user)
+        public IActionResult Create(IdentityUser user)
         {
             if (ModelState.IsValid)
             {
-                _context.User.Add(user); // Add to database
-                await _context.SaveChangesAsync(); // Save changes
-                return RedirectToAction("Insert"); // Redirect to empty form again
-            }
-
-            return View(user); // Return with validation errors
-        }
-
-        // GET: FunController/Edit/5
-
-
-        // DELETE (Remove Student)
-        // ===========================
-
-        // Show confirmation page for deleting a student
-        public async Task<IActionResult> Delete(int? id)
-        {
-            var users = await _context.User.ToListAsync();
-
-            int? userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
-            var user = await _context.User.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
+                _userRepository.Create(user);
+                _userRepository.Save();
+                return RedirectToAction("Insert");
             }
 
             return View(user);
         }
 
-        
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int userid)
+        public IActionResult Delete(string id)
         {
-            var user = await _context.User.FindAsync(userid);
-            if (user == null)
+            if (string.IsNullOrEmpty(id)) return BadRequest();
+
+            var sessionUserId = HttpContext.Session.GetString("UserId");
+            if (string.IsNullOrEmpty(sessionUserId))
             {
-                return NotFound();
+                return RedirectToAction("Login");
             }
 
-            _context.User.Remove(user);
-            await _context.SaveChangesAsync();
+            var user = _userRepository.GetById(id);
+            if (user == null) return NotFound();
 
-            return RedirectToAction("list"); // Redirect to user list after deletion
+            return View(user);
         }
 
-
-
-
-        
-       
-
-       
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult DeleteConfirmed(string userId)
+        {
+            _userRepository.Delete(userId);
+            _userRepository.Save();
+            return RedirectToAction("list");
+        }
     }
 }
