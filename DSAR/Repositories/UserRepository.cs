@@ -1,52 +1,62 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using DSAR.Data;
+﻿using DSAR.Data;
 using DSAR.Models;
+using DSAR.Repositories;
+using Microsoft.AspNetCore.Identity;
 
-namespace DSAR.Repositories
+public class UserRepository : IUserRepository
 {
-    public class UserRepository : IUserRepository
+    private readonly AppDbContext _context;
+    private readonly UserManager<User> _userManager; // Use User instead of IdentityUser
+
+    public UserRepository(AppDbContext context, UserManager<User> userManager)
     {
-        private readonly AppDbContext _context;
+        _context = context;
+        _userManager = userManager;
+    }
 
-        public UserRepository(AppDbContext context)
-        {
-            _context = context;
-        }
+    public IEnumerable<User> GetAll()
+    {
+        return _userManager.Users.ToList(); // This now returns User objects
+    }
 
-        public void Create(IdentityUser user)
-        {
-            throw new NotImplementedException();
-        }
+    public User GetById(string id)
+    {
+        return _userManager.Users.FirstOrDefault(u => u.Id == id);
+    }
 
-        public void Delete(IdentityUser UserId)
+    public void Create(User user)
+    {
+        var result = _userManager.CreateAsync(user).Result;
+        if (!result.Succeeded)
         {
-            throw new NotImplementedException();
+            throw new Exception("User creation failed");
         }
+    }
 
-        public void Delete(string userId)
+    public void Update(User user)
+    {
+        var result = _userManager.UpdateAsync(user).Result;
+        if (!result.Succeeded)
         {
-            throw new NotImplementedException();
+            throw new Exception("User update failed");
         }
+    }
 
-        public IEnumerable<IdentityUser> GetAll()
+    public void Delete(string id)
+    {
+        var user = GetById(id);
+        if (user != null)
         {
-            return _context.Users.ToList();
+            var result = _userManager.DeleteAsync(user).Result;
+            if (!result.Succeeded)
+            {
+                throw new Exception("User deletion failed");
+            }
         }
+    }
 
-        public IdentityUser GetById(string userId)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Save()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(User user)
-        {
-            throw new NotImplementedException();
-        }
+    public void Save()
+    {
+        _context.SaveChanges();
     }
 }

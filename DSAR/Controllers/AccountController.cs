@@ -41,7 +41,7 @@ namespace DSAR.Controllers
 
                 if (result.Succeeded)
                 {
-                    
+                   
                     return RedirectToAction("Main", "Account");
                 }
                 else
@@ -91,8 +91,7 @@ namespace DSAR.Controllers
         }
         [Authorize]
         public async Task<IActionResult> Main()
-        {
-
+        { 
             return View();
         }
 

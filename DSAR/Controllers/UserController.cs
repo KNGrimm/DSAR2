@@ -3,6 +3,7 @@ using DSAR.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -34,9 +35,10 @@ namespace DSAR.Controllers
             var usersViewModel = users.Select(user => new UserView
             {
                 //Fill in fields as needed
-                Id = user.Id,
+                Id = user.Id,  // Using IdentityUser's Id
                 Email = user.Email,
-                UserName = user.UserName,
+                FullName = user.FullName,
+                UserName = user.UserName
             }).ToList();
 
             return View(usersViewModel);
@@ -85,7 +87,7 @@ namespace DSAR.Controllers
         {
             if (ModelState.IsValid)
             {
-                _userRepository.Create(user);
+                //_userRepository.Create(user);
                 _userRepository.Save();
                 return RedirectToAction("Insert");
             }

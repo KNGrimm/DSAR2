@@ -1,7 +1,4 @@
-@model User
-@{
-    Layout = null;
-}
+@model DSAR.ViewModels.UserView;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,15 +12,10 @@
     <form asp-action="Logout" method="post">
         <button type="submit">Logout</button>
     </form>
-    @if (Model != null)
-    {
-        <p> @Model.FullName <strong>مرحباً ياً:</strong> </p>
-    }
-    else
-    {
-        <p>No user found.</p>
-    }
     
+   
+    <p>
+        @User.FindFirst("FullName").Value مرحباً يا
     <form asp-controller="User" asp-action="Insert" method="post">
         <input type="submit" name="name" value="Insert" />
     </form>

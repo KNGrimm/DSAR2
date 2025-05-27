@@ -1,4 +1,5 @@
 using DSAR.Data;
+using DSAR.Factories;
 using DSAR.Models;
 using DSAR.Repositories;
 using Microsoft.AspNetCore.Identity;
@@ -24,10 +25,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddIdentity<User, IdentityRole>(option =>
 {
-    option.Password.RequiredLength = 6;
-    option.Password.RequireDigit = true;
-    option.Password.RequireLowercase = true;
-    option.Password.RequireUppercase = true;
+    option.Password.RequiredLength = 3;
+    option.Password.RequireDigit = false;
+    option.Password.RequireLowercase = false;
+    option.Password.RequireUppercase = false;
     option.Password.RequireNonAlphanumeric = false;
     option.SignIn.RequireConfirmedAccount = false;
     option.SignIn.RequireConfirmedEmail = false;
@@ -37,6 +38,7 @@ builder.Services.AddIdentity<User, IdentityRole>(option =>
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserClaimsPrincipalFactory<User>, CustomUserClaimsPrincipalFactory>();
 
 var app = builder.Build();
 

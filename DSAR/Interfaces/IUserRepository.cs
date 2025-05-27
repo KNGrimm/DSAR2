@@ -5,12 +5,11 @@ namespace DSAR.Repositories
 {
     public interface IUserRepository
     {
-       IEnumerable<IdentityUser> GetAll();
-        IdentityUser GetById(string userId);
-        void Create(IdentityUser user);
+       IEnumerable<User> GetAll();
+        User GetById(string Id);
+        void Create(User user);
         void Update(User user);
-        void Delete(IdentityUser UserId);
+        void Delete(string Id);
         void Save();
-        void Delete(string userId);
     }
 }
