@@ -16,6 +16,8 @@ namespace DSAR.Data
                 .HasIndex(u => u.UserId)
                 .IsUnique(); // 👈 This makes Email unique
         }
+        public DbSet<User> User { get; set; }
+
     }
 
 }

@@ -14,49 +14,46 @@ public class UserRepository : IUserRepository
         _userManager = userManager;
     }
 
-    public IEnumerable<User> GetAll()
-    {
-        return _userManager.Users.ToList(); // This now returns User objects
-    }
-
-    public User GetById(string id)
-    {
-        return _userManager.Users.FirstOrDefault(u => u.Id == id);
-    }
-
     public void Create(User user)
     {
-        var result = _userManager.CreateAsync(user).Result;
-        if (!result.Succeeded)
-        {
-            throw new Exception("User creation failed");
-        }
+        _context.Users.Add(user);
+        return;
     }
 
-    public void Update(User user)
+    public void Delete(string Id)
     {
-        var result = _userManager.UpdateAsync(user).Result;
-        if (!result.Succeeded)
-        {
-            throw new Exception("User update failed");
+        var userInDb = _context.Users.Find(Id);
+
+        if (userInDb != null) 
+        { 
+            _context.Users.Remove(userInDb);
         }
+        throw new NotImplementedException();
     }
 
-    public void Delete(string id)
+    public IEnumerable<User> GetAll()
     {
-        var user = GetById(id);
-        if (user != null)
-        {
-            var result = _userManager.DeleteAsync(user).Result;
-            if (!result.Succeeded)
-            {
-                throw new Exception("User deletion failed");
-            }
-        }
+        var allusers = _context.Users;
+        return allusers;
+    }
+
+    public User GetById(string Id)
+    {
+        var userInDb = _context.Users.Find(Id);
+        return userInDb;
     }
 
     public void Save()
     {
         _context.SaveChanges();
+    }
+
+    public void Update(User user)
+    {
+        var userInDb = _context.Users.Find(user.Id);
+        if (userInDb != null)
+        {
+            user.FullName = user.FullName;
+        }
     }
 }

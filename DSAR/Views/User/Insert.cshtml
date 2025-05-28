@@ -19,7 +19,26 @@
     {
         <p>No user found.</p>
     }
-
-
+    <form method="post" asp-controller="User" asp-action="Create">
+    <div>
+        <label asp-for="UserId"></label>
+        <input type="text" asp-for="UserId" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="Password"></label>
+        <input type="password" asp-for="Password" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="Email"></label>
+        <input type="email" asp-for="Email" class="form-control" />
+    </div>
+    <div>
+        <label asp-for="FullName"></label>
+        <input type="text" asp-for="FullName" class="form-control" />
+    </div>
+    <div>
+        <button type="submit">Create</button>
+    </div>
+</form>
 </body>
 </html>

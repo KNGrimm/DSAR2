@@ -1,3 +1,4 @@
+﻿using DSAR.Models;
 using DSAR.Repositories;
 using DSAR.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -30,52 +31,59 @@ namespace DSAR.Controllers
 
         public IActionResult list()
         {
-            var users = _userRepository.GetAll();
+           var allusers = _userRepository.GetAll();
 
-            var usersViewModel = users.Select(user => new UserView
+            return View(allusers);
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            var user = _userRepository.GetById(id); // ✅ Use existing method
+
+            if (user == null)
             {
-                //Fill in fields as needed
-                Id = user.Id,  // Using IdentityUser's Id
+                return NotFound();
+            }
+
+            var viewModel = new UserView
+            {
+                Id = user.Id,
                 Email = user.Email,
                 FullName = user.FullName,
                 UserName = user.UserName
-            }).ToList();
+            };
 
-            return View(usersViewModel);
-        }
-
-        public IActionResult Edit(string id)
-        {
-            if (string.IsNullOrEmpty(id)) return BadRequest();
-
-            var user = _userRepository.GetById(id);
-            if (user == null) return NotFound();
-
-            return View(user);
+            return View(viewModel);
         }
 
         [HttpPost]
-        //public IActionResult Edit(IdentityUser user)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _userRepository.Update(user);
-        //        _userRepository.Save();
-        //        return RedirectToAction("list");
-        //    }
-
-        //    return View(user);
-        //}
-
-        public IActionResult Details(string id)
+        public async Task<IActionResult> Edit(UserView user)
         {
-            if (string.IsNullOrEmpty(id)) return BadRequest();
-
-            var user = _userRepository.GetById(id);
-            if (user == null) return NotFound();
+            if (ModelState.IsValid)
+            {
+                var userEntity = new User
+                {
+                    Id = user.Id,
+                    Email = user.Email,
+                    FullName = user.FullName,
+                    UserName = user.UserName
+                };
+            }
 
             return View(user);
         }
+
+
+
+        //public IActionResult Details(string id)
+        //{
+        //    if (string.IsNullOrEmpty(id)) return BadRequest();
+
+        //    var user = _userRepository.GetById(id);
+        //    if (user == null) return NotFound();
+
+        //    return View(user);
+        //}
 
         public IActionResult Create()
         {
@@ -83,28 +91,16 @@ namespace DSAR.Controllers
         }
 
         [HttpPost]
-        public IActionResult Create(IdentityUser user)
+        public IActionResult Create(User user)
         {
-            if (ModelState.IsValid)
-            {
-                //_userRepository.Create(user);
-                _userRepository.Save();
-                return RedirectToAction("Insert");
-            }
-
-            return View(user);
+            _userRepository.Create(user);
+            _userRepository.Save();
+            return View();
         }
 
         public IActionResult Delete(string id)
         {
-            if (string.IsNullOrEmpty(id)) return BadRequest();
-
-            var sessionUserId = HttpContext.Session.GetString("UserId");
-            if (string.IsNullOrEmpty(sessionUserId))
-            {
-                return RedirectToAction("Login");
-            }
-
+            
             var user = _userRepository.GetById(id);
             if (user == null) return NotFound();
 
