@@ -23,12 +23,11 @@ public class UserRepository : IUserRepository
     public void Delete(string Id)
     {
         var userInDb = _context.Users.Find(Id);
+        if (userInDb == null)
+            throw new InvalidOperationException("User not found.");
 
-        if (userInDb != null) 
-        { 
-            _context.Users.Remove(userInDb);
-        }
-        throw new NotImplementedException();
+        _context.Users.Remove(userInDb);
+        _context.SaveChanges();
     }
 
     public IEnumerable<User> GetAll()
@@ -48,12 +47,18 @@ public class UserRepository : IUserRepository
         _context.SaveChanges();
     }
 
-    public void Update(User user)
+    public void Update(User updatedUser)
     {
-        var userInDb = _context.Users.Find(user.Id);
-        if (userInDb != null)
-        {
-            user.FullName = user.FullName;
-        }
+        var userInDb = _context.Users.Find(updatedUser.Id);
+        if (userInDb == null)
+            throw new InvalidOperationException("User not found.");
+
+        // Update only specific fields
+        userInDb.FullName = updatedUser.FullName;
+        userInDb.Email = updatedUser.Email;
+        userInDb.UserName = updatedUser.UserName;
+        _context.User.Update(userInDb);
+        _context.SaveChanges(); // Save the changes
     }
+
 }

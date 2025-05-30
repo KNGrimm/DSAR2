@@ -1,4 +1,4 @@
-﻿@model DSAR.Models.User
+﻿@model DSAR.ViewModels.UserView   
 
 <h3>Are you sure you want to delete this user?</h3>
 <div>
@@ -9,7 +9,7 @@
         <dd>@Model.Email</dd>
     </dl>
 
-    <form asp-controller="User" asp-action="DeleteConfirmed" method="post">
+    <form asp-controller="User" asp-action="Delete" method="post">
         
         
         @Html.AntiForgeryToken()

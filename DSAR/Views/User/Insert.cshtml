@@ -11,22 +11,15 @@
     <form asp-action="Logout" asp-controller="Account" method="post">
         <button type="submit">Logout</button>
     </form>
-    @if (Model != null)
-    {
-        <p> @Model.FullName <strong>مرحباً ياً:</strong> </p>
-    }
-    else
-    {
-        <p>No user found.</p>
-    }
+    @User.FindFirst("FullName").Value مرحباً يا
     <form method="post" asp-controller="User" asp-action="Create">
     <div>
         <label asp-for="UserId"></label>
         <input type="text" asp-for="UserId" class="form-control" />
     </div>
     <div>
-        <label asp-for="Password"></label>
-        <input type="password" asp-for="Password" class="form-control" />
+        @* <label asp-for="Password"></label>
+        <input type="password" asp-for="Password" class="form-control" /> *@
     </div>
     <div>
         <label asp-for="Email"></label>

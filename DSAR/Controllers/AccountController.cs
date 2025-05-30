@@ -37,6 +37,7 @@ namespace DSAR.Controllers
         {
             if (ModelState.IsValid)
             {
+               
                 var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)

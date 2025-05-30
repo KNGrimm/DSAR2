@@ -4,6 +4,7 @@ using DSAR.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,11 +20,7 @@ namespace DSAR.Controllers
             _userRepository = userRepository;
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
-
+       
         public IActionResult Insert()
         {
             return View();
@@ -31,9 +28,17 @@ namespace DSAR.Controllers
 
         public IActionResult list()
         {
-           var allusers = _userRepository.GetAll();
+            var users = _userRepository.GetAll();
 
-            return View(allusers);
+            var viewModel = users.Select(u => new UserView
+            {
+                Id = u.Id,
+                FullName = u.FullName,
+                Email = u.Email,
+                UserName = u.UserName
+            }).ToList();
+
+            return View(viewModel); // ✅ Now matches @model List<UserView>
         }
 
         public async Task<IActionResult> Edit(string id)
@@ -56,22 +61,35 @@ namespace DSAR.Controllers
             return View(viewModel);
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Edit(UserView user)
+        public IActionResult Edit(UserView user)
         {
             if (ModelState.IsValid)
             {
                 var userEntity = new User
                 {
                     Id = user.Id,
-                    Email = user.Email,
                     FullName = user.FullName,
+                    Email = user.Email,
                     UserName = user.UserName
                 };
+
+                try
+                {
+                    _userRepository.Update(userEntity); // ✅ Safe update
+                    return RedirectToAction("List");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ModelState.AddModelError("", ex.Message);
+                }
             }
 
-            return View(user);
+            return View(user); // Return with errors if any
         }
+
+
 
 
 
@@ -98,22 +116,33 @@ namespace DSAR.Controllers
             return View();
         }
 
-        public IActionResult Delete(string id)
-        {
-            
-            var user = _userRepository.GetById(id);
-            if (user == null) return NotFound();
+        //public IActionResult Delete(string id)
+        //{
 
-            return View(user);
+        //    var user = _userRepository.GetById(id);
+        //    if (user == null) return NotFound();
+
+        //    return View(user);
+        //}
+        public IActionResult Delete()
+        {
+            return View();
         }
-
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult DeleteConfirmed(string userId)
+        
+        public IActionResult Delete(string Id)
         {
-            _userRepository.Delete(userId);
-            _userRepository.Save();
-            return RedirectToAction("list");
+            try
+            {
+                _userRepository.Delete(Id); // ✅ Safe tracked delete
+                return RedirectToAction("List");
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Optionally show an error message
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToAction("List");
+            }
         }
     }
 }
